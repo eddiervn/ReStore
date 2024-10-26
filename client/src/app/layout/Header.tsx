@@ -1,4 +1,4 @@
-import { AppBar, Box, FormControlLabel, Switch, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Switch, Toolbar, Typography } from "@mui/material";
 
 interface Props{
   darkMode: boolean,
