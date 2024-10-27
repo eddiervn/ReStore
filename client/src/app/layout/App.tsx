@@ -1,18 +1,22 @@
 import { ThemeProvider } from '@emotion/react';
-import Catalog from '../../features/catalog/Catalog';
+
 import Header from './Header';
 import { Container, createTheme, CssBaseline } from '@mui/material';
 import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const palleteType = darkMode? 'dark' : 'light';
 
-  const theme = createTheme({
+  let theme = createTheme({
     palette: {
       mode: palleteType,
       background:{
         default: palleteType === 'light'? '#e9ecef' : '#121212'
+      },
+      warning:{
+        main: 'rgb(253, 83, 97)'
       }
     }
   });
@@ -26,7 +30,7 @@ function App() {
         <CssBaseline/>
         <Header  handleThemeChange={ handleThemeChange} darkMode={darkMode}/>
         <Container sx={{mt:10}}>
-          <Catalog />
+          <Outlet/>
         </Container>
     </ThemeProvider>
   )
