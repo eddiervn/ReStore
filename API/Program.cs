@@ -1,4 +1,5 @@
 using API.Data;
+using API.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,7 @@ builder.Services.AddCors(options => {
         policy
         .AllowAnyHeader()
         .AllowAnyMethod()
-        .AllowCredentials()
+        .AllowCredentials() // for cookies over different domains
         .WithOrigins("http://localhost:3000");
     });
 });
@@ -28,6 +29,9 @@ builder.Services.AddCors(options => {
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

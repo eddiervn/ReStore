@@ -1,6 +1,7 @@
 import { ShoppingCart } from "@mui/icons-material";
 import { AppBar, Badge, Box, IconButton, List, ListItem, Switch, Toolbar, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
+import { useStoreContext } from "../context/StoreContext";
 
 interface Props{
   darkMode: boolean,
@@ -19,6 +20,9 @@ const rightLinks = [
 ]
 
 export default function Header({darkMode,  handleThemeChange} : Props) {
+
+  const {basket} = useStoreContext();
+  const totalItems = basket?.items.reduce((total, item) => total + item.quantity, 0);
 
   function renderListItem(title: string,path:string){
     return  <ListItem 
@@ -47,16 +51,18 @@ export default function Header({darkMode,  handleThemeChange} : Props) {
           <List sx={{display: 'flex'}}>
             { midLinks.map(({title, path}) =>  renderListItem(title, path)) }
           </List>
-          <IconButton size="large" edge="start" color="inherit" sx={{mr: 2}}>
-            <Badge badgeContent="4" color="warning">
+        </Box>
+        
+        <Box display="flex" alignItems="end">
+          <IconButton component={NavLink} to='/basket' size="large" edge="start" color="inherit" sx={{'&.active': {color: '#FFCC80'}}}>
+            <Badge badgeContent={ totalItems } color="warning">
               <ShoppingCart/>
             </Badge>
           </IconButton>
+          <List sx={{display: 'flex'}}>
+            { rightLinks.map(({title, path}) =>  renderListItem(title, path)) }
+          </List>
         </Box>
-        
-        <List sx={{display: 'flex'}}>
-          { rightLinks.map(({title, path}) =>  renderListItem(title, path)) }
-        </List>
      </Toolbar>
    </AppBar>      
   )

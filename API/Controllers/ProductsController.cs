@@ -11,6 +11,7 @@ namespace API.Controllers
 
         public ProductsController(StoreContext context)
         {
+             Thread.Sleep(1000);
             _context = context;
         }
 
