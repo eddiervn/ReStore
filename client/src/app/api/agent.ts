@@ -6,10 +6,15 @@ import { router } from "../ruoter/Routes";
 axios.defaults.baseURL = 'http://localhost:5000/api/';
 axios.defaults.withCredentials = true;                      // allows to send cookies
 
-// const sleep = () => new Promise(resolve => setTimeout(resolve, 1000));
+/*
+const sleep = (delay:number) => new Promise(
+    resolve => setTimeout(resolve, delay)
+);
+*/
 
-axios.interceptors.response.use(response => {
-    return response;
+
+axios.interceptors.response.use( response => {
+     return response;
 }, (error: AxiosError) => {
     const {data, status} = error.response as AxiosResponse;
     switch(status){

@@ -1,30 +1,30 @@
 import { Alert, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from "@mui/material"
 import { ChangeEvent, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom"
-import { Product } from "../../app/models/product";
-import agent from "../../app/api/agent";
+import { formatCurrency } from "../../app/util/util";
+import { LoadingButton } from "@mui/lab";
+import { Check, Delete } from "@mui/icons-material";
+import { removeBasketItemAsync, addBasketItemAsync } from "../basket/basketSlice";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { fetchProductAsync, productSelectors, CATALOG_STATUS_FETCH_PRODUCT_PENDING } from "./catalogSlice";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
-import { formatCurrency } from "../../app/util/util";
-import { useStoreContext } from "../../app/context/StoreContext";
-import { LoadingButton } from "@mui/lab";
-import { Check } from "@mui/icons-material";
+
 
 export default function ProductDetails() {
   const {id} = useParams<{id: string}>();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const product = useAppSelector(state => productSelectors.selectById(state, parseInt(id!)))
   const [quantity, setQuantity] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
-  const {basket, setBasket, removeItem} = useStoreContext();
+  const dispatch = useAppDispatch();
+  const {basket, status, pid} = useAppSelector(state => state.basket);
+  const {status: productStatus} = useAppSelector(state => state.catalog);
   const item = basket?.items.find(x => x.productId === product?.id);
 
   useEffect(() => {
-    id && agent.Catalog.details(parseInt(id))
-    .then(response =>  setProduct(response))
-    .catch(e => console.log(e))
-    .finally(() => setLoading(false))
-  },[id])
+    if(!product && id){
+      dispatch(fetchProductAsync(parseInt(id)));
+    }
+  },[id, product, dispatch])
 
   useEffect(() => setQuantity(item?.quantity ?? 1),[item])
 
@@ -34,31 +34,22 @@ export default function ProductDetails() {
   }
 
   function handleUpdateCart(){
-
     if(!product || item?.quantity === quantity) return;
-
-    setSubmitting(true);
     
     if(!item || quantity > item.quantity){
       // adding items
       const updatedQuantity = item? quantity - item.quantity : quantity;
-      agent.Basket.addItem(product.id, updatedQuantity)
-      .then(basket => setBasket(basket))
-      .catch(e => console.log(e))
-      .finally(() => setSubmitting(false))
+      dispatch(addBasketItemAsync({productId: product.id, quantity: updatedQuantity}));
     }
     else{
       // removing items
       const updatedQuantity = item.quantity - quantity;
-      agent.Basket.removeItem(product.id, updatedQuantity)
-      .then(() => removeItem(product.id, updatedQuantity))
-      .catch(e => console.log(e))
-      .finally(() => setSubmitting(false))
+      dispatch(removeBasketItemAsync({productId: product.id, quantity: updatedQuantity}));
     }
   }
 
 
-  if(loading)
+  if(productStatus === CATALOG_STATUS_FETCH_PRODUCT_PENDING)
     return  <LoadingComponent message="Loading product details"/>
   
   if(!product)
@@ -112,8 +103,9 @@ export default function ProductDetails() {
               variant="contained" 
               size="large" 
               color={item && quantity == 0? 'warning' : 'success'} 
+              startIcon = {item && quantity == 0? <Delete/> : <Check/>}
               sx={{fontWeight: 400}} 
-              loading = {submitting}
+              loading = {status.includes('PENDING') && pid == product.id}
               onClick = { handleUpdateCart}
               disabled = {item?.quantity === quantity || !item && quantity == 0}
               fullWidth>

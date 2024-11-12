@@ -35,7 +35,7 @@ namespace API.Controllers
 
             // get product
             var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
-            if (product == null) return NotFound();
+            if (product == null) return BadRequest(new ProblemDetails{Title = "Product not found"});
 
             // add item
            basket.AddItem(product, quantity);
@@ -76,7 +76,7 @@ namespace API.Controllers
         {
             string buyerId = Guid.NewGuid().ToString();
             var cookieOptions = new CookieOptions{IsEssential = true, Expires = DateTime.Now.AddDays(30)};
-            Response.Cookies.Append(BUYER_ID, buyerId);
+            Response.Cookies.Append(BUYER_ID, buyerId, cookieOptions);
             var basket = new Basket{BuyerId = buyerId};
             _context.Add(basket);
             return basket;
