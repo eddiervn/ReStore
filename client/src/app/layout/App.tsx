@@ -47,17 +47,17 @@ function App() {
     setDarkMode(!darkMode);
   }
 
-  if ( loading ) return <LoadingComponent message='Initializing app...' />
-
   return (
     <ThemeProvider theme={theme}>
+        {loading ? ( <LoadingComponent message='Initializing app...' />)
+        : (<>
         <ToastContainer position='bottom-right' hideProgressBar theme="colored"/>
         <CssBaseline/>
         <Header  handleThemeChange={ handleThemeChange} darkMode={darkMode}/>
         <Container sx={{mt:12}}>
           <Outlet/>
-        </Container>
-    </ThemeProvider>
+        </Container></>) }
+    </ThemeProvider> 
   )
 }
 

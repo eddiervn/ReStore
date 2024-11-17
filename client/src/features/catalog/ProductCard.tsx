@@ -15,7 +15,7 @@ export default function ProductCard({ product }: Props) {
   const dispatch = useAppDispatch();
   
   return (
-    <Card>
+    <Card variant="outlined">
       <CardHeader avatar={
         <Avatar sx={{bgcolor: 'secondary.main'}}>
           {product.name.charAt(0).toUpperCase()}

@@ -35,7 +35,7 @@ export default function Header({darkMode,  handleThemeChange} : Props) {
   }
 
   return (
-   <AppBar position="fixed">
+   <AppBar position="fixed" sx={{minWidth: '1124px', left: 0}} elevation={1}>
      <Toolbar sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <Box display="flex" alignItems="center">
           <Typography variant="h6" component={NavLink} to='/' color="inherit" sx={{textDecoration: 'none', mr: 1}}>
