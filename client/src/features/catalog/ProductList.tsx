@@ -15,7 +15,7 @@ export default function ProductList({ products } : Props) {
         { 
             products.map(product => (
                 <Grid item xs={4} key={product.id}>
-                    { productsLoaded?  <ProductCard product={product} /> : <ProductCardSkeleton/> }
+                    { productsLoaded && product?  <ProductCard product={product} /> : <ProductCardSkeleton/> }
                 </Grid>
             )) 
         }

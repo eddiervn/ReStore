@@ -2,6 +2,8 @@ namespace API.Entities
 {
     public class Basket
     {
+        public const string BUYER_ID = "buyerId";
+
         public int Id { get; set; }
         public string BuyerId { get; set; }
 

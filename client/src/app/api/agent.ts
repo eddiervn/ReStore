@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { router } from "../ruoter/Routes";
 import { PaginatedResponse } from "../models/pagination";
+import { store } from "../store/configureStore";
 
 
 axios.defaults.baseURL = 'http://localhost:5000/api/';
@@ -12,6 +13,14 @@ const sleep = (delay:number) => new Promise(
     resolve => setTimeout(resolve, delay)
 );
 */
+
+axios.interceptors.request.use( config => {
+    const token = store.getState().account.user?.token;
+    if(token){
+        config.headers.Authorization = `Bearer ${token}` ;
+    }
+    return config;
+})
 
 
 axios.interceptors.response.use( response => {
@@ -37,7 +46,7 @@ axios.interceptors.response.use( response => {
             toast.error(data.title);
             break;
         case 401:
-            toast.error(data.title);
+            toast.error(data?.title);
             break;
         case 404:
             router.navigate('/not-found')
@@ -66,6 +75,12 @@ const Catalog = {
     filters: () => requests.get('products/filters')
 };
 
+const Accont = {
+    login: (values: any) => requests.post('account/login', values),
+    register: (values: any) => requests.post('account/register', values),
+    currentUser: () => requests.get('account/current-user')
+}
+
 const TestErrors = {
     get400Error: () => requests.get('buggy/bad-request'),
     get401Error: () => requests.get('buggy/unauthorized'),
@@ -83,7 +98,8 @@ const Basket = {
 const agent = {
     Catalog,
     TestErrors,
-    Basket
+    Basket,
+    Accont
 };
 
 export default agent;

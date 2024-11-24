@@ -2,15 +2,13 @@ import { ThemeProvider } from '@emotion/react';
 
 import Header from './Header';
 import { Container, createTheme, CssBaseline } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/ReactToastify.css'
-import { getCookie } from '../util/util';
-import agent from '../api/agent';
 import LoadingComponent from './LoadingComponent';
 import { useAppDispatch } from '../store/configureStore';
-import { setBasket } from '../../features/basket/basketSlice';
+import { fetchBasketAsync} from '../../features/basket/basketSlice';
+import { fetchCurrentUser } from '../../features/account/accountSlice';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -18,18 +16,19 @@ function App() {
   const [loading, setLoading] = useState(true);
   const dispatch = useAppDispatch();
 
+const initApp = useCallback (async () => {
+    try{
+      await dispatch(fetchCurrentUser());
+      await dispatch(fetchBasketAsync());
+    }
+    catch(e: any){
+      console.log(e)
+    }
+  }, [dispatch]);
+
   useEffect(() => {
-    const buyerId = getCookie('buyerId');
-    if(buyerId){
-      agent.Basket.get()
-      .then(basket => dispatch(setBasket(basket)))
-      .catch(e => console.log(e))
-      .finally(() => setLoading(false));
-    }
-    else{
-      setLoading(false);
-    }
-  }, [])
+     initApp().then(_ => setLoading(false));
+  }, [initApp])
 
   let theme = createTheme({
     palette: {
@@ -51,7 +50,6 @@ function App() {
     <ThemeProvider theme={theme}>
         {loading ? ( <LoadingComponent message='Initializing app...' />)
         : (<>
-        <ToastContainer position='bottom-right' hideProgressBar theme="colored"/>
         <CssBaseline/>
         <Header  handleThemeChange={ handleThemeChange} darkMode={darkMode}/>
         <Container sx={{mt:12}}>

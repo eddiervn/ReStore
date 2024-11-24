@@ -11,10 +11,12 @@ import './app/layout/site.css';
 
 import { Provider } from 'react-redux';
 import { store } from './app/store/configureStore.ts';
+import { ToastContainer } from 'react-toastify';
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <ToastContainer position='bottom-right' hideProgressBar theme="colored"/>
     <Provider store={store}>
       <RouterProvider router={router}/>
     </Provider>
